@@ -1,6 +1,12 @@
 # pull official base image
 FROM python:3.8.0-alpine
 
+# install postgres
+RUN apk update && \
+    apk add --virtual build-deps gcc python-dev musl-dev && \
+    apk add postgresql-dev && \
+    apk add netcat-openbsd
+
 # set working directory
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
@@ -13,8 +19,9 @@ ENV PYTHONUNBUFFERED 1
 COPY ./requirements.txt .
 RUN pip install -r requirements.txt
 
-# add app
-COPY . .
+# add entrypoint.sh
+COPY ./entrypoint.sh /usr/src/app/entrypoint.sh
+RUN chmod +x /usr/src/app/entrypoint.sh
 
-# run server
-CMD python manage.py run -h 0.0.0.0
+# add app
+COPY . /usr/src/app
