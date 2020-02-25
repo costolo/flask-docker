@@ -17,6 +17,10 @@ user = api.model('User', {
 
 
 class UsersList(Resource):
+    @api.marshal_with(user, as_list=True)
+    def get(self):
+        return User.query.all(), 200
+
     @api.expect(user, validate=True)
     def post(self):
         post_data = request.get_json()
@@ -35,6 +39,7 @@ class UsersList(Resource):
             'message': f'{email} was added!'
         }
         return response_object, 201
+
 
 class Users(Resource):
     @api.marshal_with(user)
